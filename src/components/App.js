@@ -28,15 +28,39 @@ class App extends React.Component {
     }
   }
 
-  onChangeType = event => {
+  onChangeType = (breed) => {
     this.setState({
-      filters: {...this.state.filters,
-      type: event.target.value}
+      filters: {type: breed}
     })
   }
 
   fetchPets = () => {
-    
+    let endpoint = "/api/pets"
+    // Filtered endpoints: "/api/pets?type=cat"
+    // TO DO: ADD FILTER FUNCTIONALITY
+    if (this.state.filters.type !== 'all'){
+      endpoint += `?type=${this.state.filters.type}`
+    }
+
+    fetch(endpoint)
+    .then(resp => resp.json())
+    .then(data => {
+      this.setState({
+        pets: data
+      })
+    })
+  }
+
+  onAdoptPet = (petId) => {
+    // TO DO
+    // This callback should take in an id for a pet, find the matching pet in state.pets and set the isAdopted property to true.
+    const updatedPets = this.state.pets.map(pet => {
+      return pet.id === petId ? {...pet, isAdopted: true} : pet
+    })
+
+    this.setState({
+      pets: updatedPets
+    })
   }
 
   render() {
@@ -53,7 +77,10 @@ class App extends React.Component {
               onFindPetsClick={this.fetchPets} />
             </div>
             <div className="twelve wide column">
-              <PetBrowser />
+              <PetBrowser
+              pets={this.state.pets}
+              onAdoptPet={this.onAdoptPet}
+              />
             </div>
           </div>
         </div>
